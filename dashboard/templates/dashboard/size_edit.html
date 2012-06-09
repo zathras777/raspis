@@ -1,0 +1,34 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}{% if page %}Edit '{{sz.name}}'{% else %}Add New Thumbnail Size{% endif %}{% endblock %}
+
+{% block content %}
+<header>
+  <h1>{% if page %}Edit '{{sz.title}}'{% else %}Add New Thumbnail Size{% endif %}</h1>
+</header>
+
+<form action="." method="POST">{% csrf_token %}
+{{ form.as_p }}
+<p><input type="submit" class="aButton" value="{% if sz %}Update{% else %}Create{% endif %}"/></p>
+</form>
+<section class="italic">
+  <header><h1>Explanation</h1></header>
+  <p>If the size is NOT set as <span class="bold">Square</span> or <span class="bold">Absolute</span> then the width entered will be used to resize the longest side and the height ignored.</p>
+  <p>If set to <span class="bold">Square</span> then
+    <ol>
+      <li>the image will be resized so that the longest side is the same length as the width</li>
+      <li>a thumbnail will be created from the center of the resized image</li>
+      <li>the height entry will be ignored</li>
+    </ol>
+  </p>
+  <p>If set to <span class="bold">Absolute</span>
+    <ol>
+      <li>the width and height of the image will be checked and whichever is the smaller will be used to resize the image</li>
+      <li>a thumbnail will be created from the center of the resized image using the dimensions entered</li>
+    </ol>
+  </p> 
+</section>
+{% endblock %}
+

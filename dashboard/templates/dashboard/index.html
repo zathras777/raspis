@@ -1,0 +1,29 @@
+{% extends 'dashboard/base.html' %}
+
+{% block page_title %}Administration for {{ site_name }} : Dashboard{% endblock %}
+
+{% block extrastyle %}
+.numbers { width: 100%; text-align: center; }
+.numbers article { display: inline-block; width: 150px; font-size: 18pt; border: 2px solid #151515; }
+.numbers article header { border-bottom: 2px solid #151515; }
+.numbers article p { font-size: 36pt; padding: 15px 5px; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Welcome</h1>
+  <p>This is your dashboard where you control the site from!</p>
+</header>
+
+<section class="numbers">
+  <article class="round10">
+    <header><h1>Pictures</h1></header>
+    <p>{{ pics }}</p>
+  </article>
+  <article class="round10">
+    <header><h1>Categories</h1></header>
+    <p>{{ cats }}</p>
+  </article>
+  
+</section>
+{% endblock %}

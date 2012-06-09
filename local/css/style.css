@@ -1,0 +1,59 @@
+* {margin:0;padding:0;} 
+
+@font-face {
+  font-family: Vegur;
+  src: url('type/Vegur_L_0602.otf');
+}
+@font-face {
+  font-family: Vegur;
+  src: url('type/Vegur_R_0602.otf');
+  font-weight: bold;
+}
+
+html,body { background: white; color: #151515; height: 100%; font-family: Vegur; }
+
+#user { position: absolute; right: 30px; top: 10px; z-index: 1; }
+
+#wrap {min-height: 100%; width: 100%; vertical-align: top; }
+#wrap>#content { overflow: auto; padding-bottom: 67px; }
+
+/* page header */
+#wrap>header { height: 100px; line-height: 100%; position: relative; overflow: hidden; }
+#wrap>header>h1 { font-weight: normal; font-size: 300%; margin: 0; padding: 0 10%; position: absolute; top: 50%; }
+#wrap>header>h1>a { font-size: inherit; text-decoration: none; color: inherit; }
+
+/* content header */
+#content>header { border-top: 2px solid white; padding: 15px 0; 
+                  background: #202020; color: white; }
+#content>header>h1 { text-transform:uppercase; }
+#content>header>h1>a { color: inherit; }
+#content>header>p { font-style: italic; }
+
+/* content */
+#content>ul { list-style: none; text-align: left; }
+#content>ul>li { display: inline-block; font-size: 24px; }
+
+/* page footer */
+footer { height: 65px; margin: -69px 0 0; width: 100%; text-align: center;
+         clear: both; }
+footer a { color: inherit; }
+footer>#inner { margin: 0 10%; border-top: 1px solid #151515; height: 100%; position: relative; }
+footer .bottom { position: absolute; text-align: center; bottom: 5px; width: 100%; }
+#pageList { clear: left; text-align: center; position: relative; }
+#pageList>ul { list-style: none; height: 40px; padding-top: 3px; }
+#pageList>ul>li.page { display: inline-block; font-size: 26px; padding: 0 10px; height: 36px;}
+#pageList>ul>li a { text-decoration: none; color: inherit; padding: 5px 0; }
+
+/* generic classes */
+.centered { text-align: center; }
+.placeholder { width: 100%; height: 300px; display: block; 
+               background: url(287.gif) center no-repeat; }
+.kwicks_placeholder { width: 100%; height: 400px; position: absolute; 
+                      top: 30px; left: 0; display: block; 
+                      background: url(287_white.gif) center no-repeat; }
+.nav { cursor: pointer; position: absolute; top: 50%; margin-top: -25px; 
+       width: 50px; height: 50px; }
+.nav-prev { background: url(prev.png) center no-repeat; color: white; }
+.nav-next { background: url(next.png) center no-repeat; color: white; }
+.shadow5 { -webkit-box-shadow: 0 0 5px #aaa; box-shadow: 0 0 5px #aaa; }
+

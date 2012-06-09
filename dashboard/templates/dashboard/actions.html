@@ -1,0 +1,22 @@
+{% extends 'dashboard/base.html' %}
+
+{% block page_title %}Actions{% endblock %}
+
+{% block extrastyle %}
+.nb { color: red; font-weight: bold; margin: 5px; }
+.right { text-align: right; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Actions</h1>
+  <p>Maintenance actions for the site.</p>
+</header>
+    
+<article>
+  <header><h1>Regenerate Thumbnails</h1></header>
+  <p>This will take a while, but basically it goes through all pictures on the site and regenerates the required thumbnails.</p>
+  <p class="nb">NB This will result in any category images that have been "flipped" reverting to their "unflipped" state.</p>
+  <p class="right"><a href="thumbnails/" class="aButton">Generate Thumbnails</a></p>
+</article>
+{% endblock %}

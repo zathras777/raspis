@@ -1,0 +1,55 @@
+<?DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block page_title %}today{% endblock %}</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+{% block extrahead %}{% endblock %}
+  </head>
+  <body>
+    <div id="container">
+    <div id="blurb">
+    <header>
+      <h1>one a day</h1>
+      <h2>photos by<br/>david reid</h2>
+    </header>
+    <nav>
+      <ul>
+{% block nav %}
+        <li><a href="/older/">older</a></li>
+        <li><a href="/popular/">popular</a></li>
+        <li><a href="/about/">about</a></li>
+{% endblock %}
+      </ul>
+    </nav>
+    <p class="links">
+      <a href="/rss/">rss</a>
+      <a href="/atom/">atom</a>
+    </p>
+{% if not user.is_authenticated %}
+    <p class="links">
+<a href="https://twitter.com/zathras" class="twitter-follow-button" data-show-count="false">Follow @zathras</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </p>
+    <p class="links">
+      <g:plusone size="small" href="http://photo.david-reid.com/"></g:plusone>
+    </p>
+{% endif %}
+    <footer>
+      <p>&copy; <a href="/login/">david reid</a> 2012.</p>
+    </footer>
+    </div>
+    <div id="content">
+{% block content %}
+{% endblock %}
+    </div>
+    </div>
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+  </body>
+</html>

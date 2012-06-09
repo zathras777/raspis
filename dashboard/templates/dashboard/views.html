@@ -1,0 +1,57 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Views{% endblock %}
+
+{% block extrastyle %}
+ul { margin-left: 50px; }
+.views { position: relative; width: 154px; height: 154px; margin: 2px; float: left; cursor: pointer; }
+img { position: absolute; top: 2px; left: 2px; }
+.count { position: absolute; bottom: 5px; left: 5px; }
+.cviews { position: relative; width: 604px; height: 404px; margin: 2px; float: left; cursor: pointer; }
+.name { position: absolute; right: 5px; top: 5px; font-size: 36pt; }
+.cviews>.count { font-size: 24pt; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Views</h1>
+  <p>Number of views for categories and pictures.</p>
+</header>
+
+<p>Notes:
+<ul>
+  <li>views by staff are not included</li>
+  <li>only those pictures and categories that have been viewed are shown</li>
+</ul>
+
+<section class="clearfix">
+  <header><h1>Photos</h1></header>
+{% for p in photos %}
+<div class="views" data-href="{% url photo_edit p.photo.id %}">
+  {% getImageTag p.photo "Square" %}
+  <span class="count overlay round5">{{ p.views }}</span>
+</div>
+{% endfor %}
+</section>
+
+<section class="clearfix">
+  <header><h1>Categories</h1></header>
+  {% for c in cats %}
+<div class="cviews" data-href="{% url category_edit c.category.slug %}">
+  {% getImageTag c.category.image %}
+  <span class="count overlay round5">{{ c.views }}</span>
+  <span class="name overlay round5">{{ c.category.name }}</span>
+</div>
+  {% endfor %} 
+</section>
+
+{% endblock %}
+
+{% block extrascript %}
+$('div.views').click(function() {
+  window.location.href = $(this).attr('data-href');
+});
+{% endblock %}
+

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Administration for {{ site_name }} : {% block page_title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/smoothness/jquery-ui-1.8.20.custom.css" />
+
+<!--[if !IE 7]>
+	<style type="text/css">
+		#wrap {display:table;height:100%}
+	</style>
+<![endif]-->
+{% block extrahead %}{% endblock %}
+    <style>
+{% block extrastyle %}{% endblock %}
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+    <header>
+      <h1><a href="/">{{ site_name }}</a></h1>
+    </header>
+    
+    <nav>
+      <ul>
+<li data-href="/dashboard/" {% if where = 'home' %}class="active"{% endif %}>Home</li>
+<li data-href="settings" {% if where = 'settings' %}class="active"{% endif %}>Settings</li>
+<li data-href="users" {% if where = 'users' %}class="active"{% endif %}>Users</li>
+<li data-href="categories" {% if where = 'categories' %}class="active"{% endif %}>Categories</li>
+<li data-href="sizes" {% if where = 'sizes' %}class="active"{% endif %}>Picture Sizes</li>
+<li data-href="pages" {% if where = 'pages' %}class="active"{% endif %}>Pages</li>
+<li data-href="pictures" {% if where = 'pictures' %}class="active"{% endif %}>Pictures</li>
+<li data-href="upload" {% if where = 'upload' %}class="active"{% endif %}>Upload Pictures</li>
+<li data-href="daily" {% if where = 'daily' %}class="active"{% endif %}>Daily Picture</li>
+<li data-href="views" {% if where = 'views' %}class="active"{% endif %}>Views</li>
+<li data-href="actions" {% if where = 'actions' %}class="active"{% endif %}>Actions</li>
+{% if user.is_superuser %}
+<li data-href="/admin/">Django Admin</li>
+{% endif %}
+<li data-href="/logout/">Logout</li>
+      </ul>
+    </nav>
+
+    <div id="content">
+{% if messages %}
+  <div id="messages">
+    {% for m in messages %}{{m}}{% endfor %}
+  </div>
+{% endif %}
+{% block content %}
+{% endblock %}
+    </div>
+    </div>
+    <footer>
+      <p>{{ copyright|safe }} {{ site_author }}</p>
+    </footer>
+{% if debug %}
+    <script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"> </script>
+    <script src="{{ STATIC_URL }}js/jquery-ui-1.8.20.custom.min.js"> </script>
+{% else %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+{% endif %}
+    <script>
+$('nav>ul>li').click(function() {
+  var href = $(this).attr('data-href');
+  if (href.substring(0,1) == '/') {
+    window.location.href = href;
+  } else {
+    window.location.href = '/dashboard/' + href + '/'; 
+  }
+});
+$('.aButton').button();
+{% if messages %}
+$('#messages').delay(7500).slideUp('slow', function() { $('#messages').remove(); });
+{% endif %}
+{% block extrascript %}{% endblock %}
+    </script>
+  </body>
+</html>

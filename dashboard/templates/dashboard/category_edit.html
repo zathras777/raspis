@@ -1,0 +1,123 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}{% if cat %}Edit '{{cat.name}}' Category{% else %}Add New Category{% endif %}{% endblock %}
+
+{% block extrastyle %}
+form label, form input[type='text'] { font-size: 14pt; }
+#flip { position: absolute; bottom: 3px; left: 3px; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>{% if cat %}Edit '{{cat.name}}' Category{% else %}Add New Category{% endif %}</h1>
+</header>
+
+<table width="100%">
+  <tr>
+    <td width="20%" align="center" vertical-align="middle" id="catpicture" style="position: relative;">
+      <p>Drop an image to set the category picture</p>      
+<span id="flip">flip</span>
+    </td>
+    <td width="80%">
+<form action="." method="POST">{% csrf_token %}
+{{ form.as_p }}
+<p><input type="submit" class="aButton" value="{% if cat %}Update{% else %}Create{% endif %}"/></p>
+</form>
+    </td>
+  </tr>
+</table>
+
+{% if cat %}
+<section id="drop_add">
+  <header><h1>Photos Included</h1></header>
+<div id="included">
+{% for p in pics %}{% getImageTag p "Small Square" %}{% empty %}<p>No photos included at present.</p>{% endfor %}
+</div>
+</section>
+
+<section id="drop_remove">
+  <header><h1>Photos Available To Include</h1></header>
+<div id="avail">
+{% for p in avail %}{% getImageTag p "Small Square" %}{% empty %}<p>No photos available to be include.</p>{% endfor %}
+</div>
+</section>
+<div id="spinner" class="round10">
+  <img src="/css/ajax-loader2.gif" align="center"/>
+  <p>Submitting...</p>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extrascript %}
+options = { opacity: 0.7, revert: true };
+$("#avail>img").draggable(options);
+$("#included>img").draggable(options);
+function move_element(el, to)
+{
+    el.fadeOut(function() {
+      el.remove().css({'top': null, 'left': null, 'opacity': 1.0});
+      el.remove().appendTo(to).fadeIn().draggable(options);
+    });
+}
+$("#drop_add").droppable({ 
+  drop: function( event, ui ) {
+    $('#spinner').show();
+    var el = ui.draggable;
+    $.ajax({url: 'photo/add/', type: 'post', 
+            data: {'id': el.attr('data-id')},
+            success: function() { move_element(el, $('#included')); },
+            complete: function() { $('#spinner').hide(); }
+           });
+
+  }
+});
+$("#drop_remove").droppable({ 
+  drop: function( event, ui ) {
+    $('#spinner').show();
+    var el = ui.draggable;
+    $.ajax({url: 'photo/remove/', type: 'post', 
+            data: {'id': el.attr('data-id')},
+            success: function() { move_element(el, $('#avail')); },
+            complete: function() { $('#spinner').hide(); }
+           });
+  }
+});
+
+$("#catpicture").droppable({
+  drop: function(ev, ui) {
+    var el = ui.draggable;
+    $.ajax({url: 'photo/set/', type: 'post', 
+            data: {'id': el.attr('data-id')},
+            success: get_picture
+           });
+  }
+});
+function get_picture() {
+  $('#catpicture').find('img').remove();
+  $('#catpicture>p').show();
+  $.ajax({url: 'photo/get/',
+          dataType: 'json',
+          success: function(data) {
+            if (data.url) {
+              $('#catpicture>p').hide();
+              url = data.url + '?lastmod=' + new Date().getTime();
+              $('<img>').attr({'src': url}).width(data.width).height(data.height).appendTo($('#catpicture'));
+            }
+          }
+  });
+}
+$('#flip').click(function() {
+  $.ajax({url: 'photo/flip/',
+          success: function() {
+            $('#catpicture>img').remove();
+            get_picture();
+          }
+         });
+});
+get_picture();
+{% endblock %}
+

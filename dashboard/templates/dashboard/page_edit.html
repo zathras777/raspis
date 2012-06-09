@@ -1,0 +1,22 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}{% if page %}Edit '{{page.title}}' Page{% else %}Add New Page{% endif %}{% endblock %}
+
+{% block content %}
+<header>
+  <h1>{% if page %}Edit '{{page.title}}' Page{% else %}Add New Page{% endif %}</h1>
+</header>
+
+<form action="." method="POST">{% csrf_token %}
+{{ form.as_p }}
+<p><input type="submit" class="aButton" value="{% if page %}Update{% else %}Create{% endif %}"/></p>
+</form>
+{% endblock %}
+
+{% block extrascript %}
+$('#id_first_dt').datepicker();
+$('#id_last_dt').datepicker();
+{% endblock %}
+

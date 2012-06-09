@@ -1,0 +1,25 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Edit Picture{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Edit Picture</h1>
+  <p>Edit picture details.</p>
+</header>
+<p class="centered">
+  {% getImageTag photo "Medium" %}
+</p>
+<p class="centered">
+  <a href="{% url original photo.id %}" class="aButton">Download Original</a>
+  <a href="{% url photo_thumbs photo.id %}" class="aButton">View Thumbnails</a>
+</p>
+
+<form action="." method="POST" enctype="multipart/form-data">{% csrf_token %}
+{{ form.as_p }}
+<p><label>&nbsp;</label><input type="submit" class="aButton" value="Update"/></p>
+</form>
+{% endblock %}
+

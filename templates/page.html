@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ cat.title }}{% endblock %}
+
+{% block extrastyle %}
+#page { padding: 10px 10%; font-size: 14pt; }
+{% endblock %}
+
+{% block content %}
+<header class="centered">
+  <h1>{{ p.title }}</h1>
+</header>
+
+<section id="page">
+{{ p.content|safe }}
+</section>
+{% endblock %}
+
+{% block extrascript %}
+
+{% endblock %}

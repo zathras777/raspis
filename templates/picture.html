@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ photo.title|default:"Untitled" }}{% endblock %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/gallery.css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}fancybox/source/jquery.fancybox.css?v=2.0.6" type="text/css" media="screen" />
+{% endblock %}
+
+{% block extrastyle %}
+.picture { padding: 30px 10% 10px; text-align: center; }
+.picture>img{ -moz-box-shadow: 5px 5px 5px #888; -webkit-box-shadow: 5px 5px 5px #888;
+box-shadow: 5px 5px 5px #888; }
+.tweet { padding-bottom: 10px; text-align:center; }
+.links { padding: 0 10%; font-size: 18pt; }
+.links>a { color: #252525; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1 class="centered">
+    <a href="{% url raspis.views.category category.slug %}">{{category.name}}</a>
+     : {{ photo.title|default:"Untitled" }}
+  </h1>
+</header>
+
+<p class="picture">
+  <img src="{{image.img.url}}" width="{{image.img.width}}" 
+       height="{{image.img.height}}" alt="{{photo.title}}" 
+       title="{{photo.title}}"/>
+</p>
+{% if options_twitter %}
+<p class="tweet">
+  <a href="https://twitter.com/share" class="twitter-share-button" 
+     data-url="http://{{site_url}}/pic/{{photo.id}}/" 
+     data-text="{{site_name}} : {{ photo.title }}" data-dnt="true">Tweet</a>
+</p>
+{% endif %}
+<div id="slideshow">slideshow</div>
+{% endblock %}
+
+{% block extrascripts %}
+<script src="{{ STATIC_URL }}fancybox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+<!-- Add fancyBox -->
+<script src="{{ STATIC_URL }}fancybox/source/jquery.fancybox.pack.js?v=2.0.6"></script>
+<!-- Optionally add helpers - button, thumbnail and/or media -->
+<script src="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.2"></script>
+<script src="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.0"></script>
+<script src="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-thumbs.js?v=2.0.6"></script>
+{% if options_twitter %}
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+{% endif %}
+{% endblock %}
+
+{% block extrascript %}
+function do_slideshow()
+{
+  $.getJSON('{% url category_slideshow category.slug %}', function(response){
+    $.fancybox(response.images, {
+        'padding'           : 0,
+        'transitionIn'      : 'none',
+        'transitionOut'     : 'none',
+        'type'              : 'image',
+        'changeFade'        : 0,
+        'autoPlay': true
+    });
+  }); 
+}
+
+$('.links a').on({
+  mouseenter: function() { $(this).animate({ marginTop: -10 }); },
+  mouseleave: function() { $(this).animate({ marginTop: 0 }); }
+});
+$('#slideshow').on({
+  click: function() { do_slideshow(); },
+  mouseenter: function() { $(this).animate({ marginLeft: 80 }); },
+  mouseleave: function() { $(this).animate({ marginLeft: -10 }); }
+});
+
+{% endblock %}

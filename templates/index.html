@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block extrastyle %}
+#kwicks { background: #151515; height: 410px; padding: 25px 10%; position: relative; }
+#kwicks>ul { list-style: none; position: relative; margin: 0 auto; 
+             border-right: 5px solid white; display: none; }  
+#kwicks>ul>li{ display: block; overflow: hidden; position: relative;
+               cursor: pointer; width: 230px; height: 410px;
+               background: white; }
+.background { position: absolute; top: 5px; left: 5px; }
+.opacity { display: block; width: 600px; height: 400px; }
+
+.category_details { color: white; background: #333; opacity: 0.8; 
+                    width: 100%; position: absolute; bottom: 0; left: 0;
+                    margin: 0 5px 5px 5px; padding: 5px; text-align: left;
+                    display: none; }
+.category_details>h2 { margin: 5px; padding: 0; }
+.category_details>p { margin: 3px; padding: 0; }
+
+#prev { left: 30px; }
+#next { right: 30px; }
+.flip { position: absolute; top: 10px; left: 10px; z-index: 1000; 
+        color: white; cursor: pointer; }
+footer>#inner { border-top: 0; }
+{% endblock %}
+
+{% block content %}
+<section id="kwicks">
+  <div id="placeholder" class="kwicks_placeholder"></div>
+  <ul></ul>
+  <div class="nav nav-prev" id="prev"></div>
+  <div class="nav nav-next" id="next"></div>
+</section>
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{{ STATIC_URL }}js/jquery.kwicks-1.5.1.pack.js"> </script>
+{% endblock %}
+
+{% block extrascript %}
+function slide() {
+  var kw = $('#kwicks>ul');
+  var n = $('#kwicks>ul>li').length;
+  w = Math.min(n * 605, $('#kwicks').width());
+  kw.width(w);
+  var liw = Math.floor(w / n);
+  $('#kwicks>ul>li').width(liw);
+  kw.kwicks({ max : 605 });
+}
+function add_kwicks(data) {
+  var kw = $('#kwicks>ul');
+  var lis = $('#kwicks>ul>li');
+  if (data.page > 0) { $('#prev').show(); } else { $('#prev').hide(); }
+  if (data.more) { $('#next').show(); } else { $('#next').hide(); }
+
+  kw.empty();
+
+  $.each(data.cats, function(idx, cat) {
+    var li = $('<li>').addClass('kwick_frame').attr({'id': cat.slug});
+    var d1 = $('<div class="background">');
+    if (cat.image) {
+{% if user.is_staff %}
+      var ts = new Date().getTime();
+      d1.attr('style', "background: url("+cat.image.url+"?lastmod="+ts+") center no-repeat;");
+{% else %}
+      d1.attr('style', "background: url("+cat.image.url+") center no-repeat;");
+{% endif %}
+    }
+    d1.append($('<div>').addClass('opacity'));
+    var d2 = $('<div class="category_details">');
+    d2.append($('<h2>').text(cat.name));
+    if (cat.desc) { d2.append($('<p>').text(cat.desc)); }   
+    li.append(d1).append(d2);
+    kw.append(li);
+  });
+
+  slide();
+  kw.fadeIn();
+  $('#placeholder').hide();
+}  
+var p = {{ indexp }};
+$().ready(function() {
+  $.getJSON('/ajax/categories/', { 'p': p, 'w': Math.floor($('#kwicks').width())},
+            function(data) { add_kwicks(data); });
+
+  $('#next').click(function() {
+    $('#placeholder').show();
+    $('#kwicks>ul').fadeOut();
+    var jqxhr = $.getJSON('/ajax/categories/', 
+                          {'p':p + 1, 'w': $('#kwicks').width()},
+                          function(data) { add_kwicks(data); p = p + 1; })
+  });
+  $('#prev').click(function() {
+    if (p > 0) {
+      $('#placeholder').show();
+      $('#kwicks>ul').fadeOut();
+      var jqxhr = $.getJSON('/ajax/categories/', 
+                            {'p':p - 1, 'w': $('#kwicks').width()},
+                            function(data) { add_kwicks(data); p = p -1; })
+    }
+  });
+
+});
+$(document).on({
+		mouseenter: function() {
+			jQuery('.category_details', this).stop(true, true).delay(500).fadeIn(500);
+		},
+		mouseleave: function() {
+			jQuery('.category_details', this).stop(true, true).hide(500);
+		},
+		click: function() { window.location.href='/c/'+$(this).attr('id')+'/'; }
+}, '.kwick_frame');
+{% if mobile %}
+$('body').on("orientationchange", slide);
+{% endif %}
+{% endblock %}
+

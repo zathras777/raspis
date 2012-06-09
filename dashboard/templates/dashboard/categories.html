@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Settings for {{ site_name }} : Dashboard{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Categories</h1>
+  <p>Create & manage the categories photos will be assigned to.</p>
+</header>
+
+<table width="80%">
+  <tr>
+    <th width="20%">Category Name</th>
+    <th width="50%">Description</th>
+    <th width="10%"># Photos</th>
+    <th width="10%">Visible?</th>
+    <th width="10%">Options</th>
+  </tr>
+{% for c in cats %}
+  <tr>
+    <td><a href="edit/{{c.slug}}/">{{c.name}}</a></td>
+    <td><span class="italic">{{ c.desc}}</span></td>
+    <td class="centered">{{c.photo_set.count}}</td>
+    <td class="centered">{{ c.visible }}</td>
+    <td class="centered"><a href="remove/{{c.slug}}/" class="aButton remove" alt="Remove" title="Remove">X</a></td>
+  </tr>
+{% endfor %}
+</table>
+<p><a href="new/" class="aButton">Add Category</a></p>
+
+
+{% endblock %}
+
+{% block extrascript %}
+$('.remove').click(function(ev) {
+  var name = $(this).parent().siblings().eq(0).text();
+  if (! confirm("Please confirm you wish to remove the category " + name + "?")) {
+    ev.preventDefault();
+  }
+});
+{% endblock %}

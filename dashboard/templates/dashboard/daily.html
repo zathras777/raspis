@@ -1,0 +1,41 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Daily Pictures{% endblock %}
+
+{% block extrastyle %}
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Daily Pictures</h1>
+  <p>The pictures chosen to be the picture of the day, past, present and future.</p>
+</header>
+
+<section>
+  <header><h1>Past</h1></header>
+  <p class="centered">
+  {% for p in past %}
+    {% getImageTag p.photo "Square" %}
+  {% endfor %}
+  </p>
+</section>
+
+<section>
+  <header><h1>Today</h1></header>
+  <p class="centered">
+  {% if present %}{% getImageTag present.photo "Medium" %}{% else %}No image selected for today.{% endif %}
+  </p>
+</section>
+
+<section>
+  <header><h1>Upcoming</h1></header>
+  <p class="centered">
+  {% for p in future %}
+    {% getImageTag p.photo "Square" %}
+  {% endfor %}
+  </p>
+</section>
+  
+{% endblock %}

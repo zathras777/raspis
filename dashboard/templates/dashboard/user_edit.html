@@ -1,0 +1,21 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block extrastyle %}
+.helptext { font-style: italic; color: #999; font-size: 10pt; }
+{% endblock %}
+
+{% block page_title %}{% if page %}Edit '{{u.get_full_name|default:"No Name"}}'{% else %}Add New User{% endif %}{% endblock %}
+
+{% block content %}
+<header>
+  <h1>{% if page %}Edit '{{u.get_full_name|default:"No Name"}}'{% else %}Add New User{% endif %}</h1>
+</header>
+
+<form action="." method="POST">{% csrf_token %}
+{{ form.as_p }}
+<p><input type="submit" class="aButton" value="{% if sz %}Update{% else %}Create{% endif %}"/></p>
+</form>
+{% endblock %}
+

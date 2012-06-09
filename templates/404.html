@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Unknown Page (404){% endblock %}
+
+{% block extrastyle %}
+#content>header { padding-left: 10%; }
+#content>p { padding: 20px 10%; font-size: 14pt; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Unknown Page</h1>
+  <p>Commonly known as a 404 error.</p>
+</header>
+
+<p>Sadly the page you asked for isn't available on this site.</p>
+
+{% endblock %}

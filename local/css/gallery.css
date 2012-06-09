@@ -1,0 +1,11 @@
+#gallery { padding: 10px 10%; text-align: center; }
+#gallery>p { margin: 0 auto; vertical-align: top; clear: both; }
+.gallery_image { overflow: hidden; float: left; margin: 3px 3px 10px; 
+                 position: relative; -moz-box-shadow: 5px 5px 5px #aaa; 
+                 -webkit-box-shadow: 5px 5px 5px #aaa;
+                 box-shadow: 5px 5px 5px #aaa; cursor: pointer; }
+#slideshow { background: #bbb; color: white; padding: 10px 30px 5px; 
+             position: fixed; top: 250px; left: -100px; border-radius: 30px;
+             font-weight: bold; font-size: 14pt; box-shadow: 0 0 5px #aaa;
+             -moz-box-shadow: 0 0 5px #aaa; -webkit-box-shadow: 0 0 5px #aaa; }
+

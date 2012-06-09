@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ cat.name }}{% endblock %}
+
+{% block extrastyle %}
+#content>header { position: relative; }
+#prev { left: 30px; }
+#next { right: 30px; }
+{% endblock %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{{ STATIC_URL }}fancybox/source/jquery.fancybox.css?v=2.0.6" media="screen" />
+<link rel="stylesheet" href="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.2" media="screen" />
+<link rel="stylesheet" href="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-thumbs.css?v=2.0.6" media="screen" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/gallery.css" />
+{% endblock %}
+
+{% block content %}
+<header class="centered">
+  <h1>{{ rv.cat.name }}</h1>{% if rv.cat.desc|length %}<p>{{ rv.cat.desc }}</p>{% endif %}
+{% if rv.prev %}
+  <div class="nav nav-prev" id="prev" data-href="/c/{{rv.prev.slug}}/" title="{{rv.prev.name}}"></div>
+{% endif %}
+{% if rv.next %}
+  <div class="nav nav-next" id="next" data-href="/c/{{rv.next.slug}}/" title="{{rv.next.name}}"></div>
+{% endif %}
+</header>
+
+<section id="gallery">
+  <div class="placeholder"></div>
+</section>
+<div id="slideshow">slideshow</div>
+{% endblock %}
+
+{% block extrascripts %}
+<script src="{{ STATIC_URL }}fancybox/lib/jquery.mousewheel-3.0.6.pack.js"></script>
+<!-- Add fancyBox -->
+<script src="{{ STATIC_URL }}fancybox/source/jquery.fancybox.pack.js?v=2.0.6"></script>
+<!-- Optionally add helpers - button, thumbnail and/or media -->
+<script src="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.2"></script>
+<script src="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.0"></script>
+<script src="{{ STATIC_URL }}fancybox/source/helpers/jquery.fancybox-thumbs.js?v=2.0.6"></script>
+{% endblock %}
+
+{% block extrascript %}
+function add_gallery()
+{
+  $.getJSON('gallery/', { 'width': $('#gallery').width() - 10 },
+    function(data) {
+      $('#gallery').empty();
+      if (data.rows.length) { $('#slideshow').show(); } else { $('#slideshow').hide(); }
+      $.each(data.rows, function(idx, r) {
+        var p = $('<p>').width(r.width).height(r.height + 8);
+          $.each(r.data, function(idx2, img) {
+          var sp = $('<span>').addClass('gallery_image').width(img.width)
+                              .height(r.height)
+                              .attr('data-href', '/pic/'+img.id+'/');
+          var ie = $('<img>').attr('src', img.url);
+          if (img.hdiff) { ie.css('margin-top', img.hdiff * -1); }
+          sp.append(ie);
+          p.append(sp);
+        });
+        $('#gallery').append(p);
+      });
+   }
+  );
+}
+function do_slideshow()
+{
+  $.getJSON('slideshow/', function(response){
+    $.fancybox(response.images, {
+        'padding'           : 0,
+        'transitionIn'      : 'none',
+        'transitionOut'     : 'none',
+        'type'              : 'image',
+        'changeFade'        : 0,
+        'autoPlay': true
+    });
+  }); 
+}
+
+add_gallery();
+$(document).on({
+  click: function() {
+    window.location.href = $(this).attr('data-href');
+  },
+  mouseenter: function() {
+    jQuery(this).animate({ marginTop: -5 }); 
+  },
+  mouseleave: function() {
+    jQuery(this).animate({ marginTop: 3 }); 
+  }
+}, ".gallery_image");
+$('#slideshow').on({
+  click: function() { do_slideshow(); },
+  mouseenter: function() { $(this).animate({ marginLeft: 80 }); },
+  mouseleave: function() { $(this).animate({ marginLeft: -10 }); }
+});
+{% if rv.prev %}
+$('#prev').click(function() { window.location.href = $(this).attr('data-href'); });
+{% endif %}
+{% if rv.next %}
+$('#next').click(function() { window.location.href = $(this).attr('data-href'); });
+{% endif %}
+{% if mobile %}
+$('body').on("orientationchange", add_gallery);
+{% endif %}
+
+{% endblock %}

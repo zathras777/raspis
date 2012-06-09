@@ -1,0 +1,28 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Pages{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Pages</h1>
+  <p>Static content to be displayed.</p>
+</header>
+
+<table width="80%" align="center">
+  <tr>
+    <th width="20%">Title</th>
+    <th width="70%">Contents</th>
+    <th width="10%">Delete</th>
+  </tr>
+  {% for p in pages %}
+  <tr>
+    <td><a href="edit/{{p.slug}}/">{{ p.title }}</a></td>
+    <td>{% if p.url %}<a href="{{p.url}}">{{p.url}}</a>{% else %}{{ p.content|truncatewords:50|safe}}{% endif %}</td>
+    <td class="centered"><a href="remove/{{p.slug}}/" class="aButton">X</a></td>
+  </tr>
+  {% endfor %}
+</table>
+<p><a href="new/" class="aButton">Add Page</a></p>
+{% endblock %}

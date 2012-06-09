@@ -1,0 +1,36 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Thumbnail Sizes{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Thumbnail Sizes</h1>
+  <p>Each picture uploaded will have all of these thumbnails created.</p>
+</header>
+
+<table width="80%">
+  <tr>
+    <th width="20%">Name</th>
+    <th width="15%">Width</th>
+    <th width="15%">Height</th>
+    <th width="15%">Square?</th>
+    <th width="15%">Absolute?</th>
+    <th width="20%">Options</th>
+  </tr>
+{% for sz in sizes %}
+  <tr>
+    <td><a href="edit/{{sz.id}}/">{{sz.name}}</a></td>
+    <td class="centered">{{ sz.width }}</td>
+    <td class="centered">{{ sz.height }}</td>
+    <td class="centered">{{ sz.square }}</td>
+    <td class="centered">{{ sz.absolute }}</td>
+    <td class="centered"><a href="remove/{{c.id}}/" class="aButton">X</a></td>
+  </tr>
+{% endfor %}
+</table>
+<p><a href="new/" class="aButton">Add Thumbnail Size</a></p>
+
+
+{% endblock %}

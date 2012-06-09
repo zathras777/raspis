@@ -1,0 +1,45 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Users{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Users</h1>
+  <p>The following users are listed for this web site and can access this section.</p>
+</header>
+
+<table width="90%">
+  <tr>
+    <th width="12%">Username</th>
+    <th width="20%">Name</th>
+    <th width="10%">Active?</th>
+    <th width="10%">Staff?</th>
+    <th width="10%">Superuser?</th>
+    <th width="28%">Options</th>
+  </tr>
+{% for u in users %}
+  <tr>
+    <td><a href="edit/{{u.id}}/">{{u.username}}</a></td>
+    <td>{{ u.get_full_name|default:"No name given" }}</td>
+    <td class="centered">{{ u.is_active }}</td>
+    <td class="centered">{{ u.is_staff }}</td>
+    <td class="centered">{{ u.is_superuser }}</td>
+    <td class="centered">
+      <a href="pw/{{u.id}}/" class="aButton">pw</a>
+      <a href="edit/{{u.id}}/" class="aButton">edit</a>
+      <a href="remove/{{u.id}}/" class="aButton">remove</a>
+    </td>
+  </tr>
+  {% if not u.has_usable_password %}
+  <tr>
+    <td colspan="6" class="centered italic">This user has an unusable password and cannot log in</td>
+  </tr>
+  {% endif %}
+{% endfor %}
+</table>
+<p><a href="new/" class="aButton">Add User</a></p>
+
+
+{% endblock %}

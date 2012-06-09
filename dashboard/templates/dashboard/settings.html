@@ -1,0 +1,43 @@
+{% extends 'dashboard/base.html' %}
+
+{% block page_title %}Settings{% endblock %}
+
+{% block extrastyle %}
+#settings_list { margin: 10px 10%; list-style: none; font-size: 125%; }
+#settings_list>li>label { display: inline-block; width: 35%; text-align: right; font-weight: bold;}
+
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Settings : {{ grp.name }}</h1>
+  <p>Alter general settings related to the site.</p>
+</header>
+<p>{{grp.desc}}</p>
+<form action="." method="POST">{% csrf_token %}
+{{ form.as_p }}
+<p><input class="aButton" type="submit" value="Update Settings"/></p>
+</form>
+<p class="centered">
+  {% for g in grps %}
+    {% if g == grp %}
+      {{ g.name }}
+    {% else %}
+  <a href="{% url settings_grp g.name %}">{{ g.name }}</a>
+    {% endif %}
+  {% endfor %}
+</p>
+
+<section>
+  <header><h1>Template Settings</h1></header>
+  <p>The following list shows all settings as they are available in a template.</p>
+  <ul id="settings_list">
+  {% for g in grps %}
+    {% for k,v in g.settings.items %}
+      <li><label>{{ g.name }}_{{k}} :</label> {{ v|safe }}</li>
+    {% endfor %}
+  {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

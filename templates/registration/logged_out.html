@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block pageTitle %}Login{% endblock %}
+
+{% block extrastyle %}
+#logout { padding: 20px 10%; font-size: 14pt; }
+#content>header { padding: 15px 10%; }
+{% endblock %}
+
+{% block content %}
+  <header><h1>Logged Out</h1></header>
+<section id="logout">
+  <p>You have now been logged out from this site.</p>
+</section>
+{% endblock %}

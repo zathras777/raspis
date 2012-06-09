@@ -1,0 +1,28 @@
+{% extends 'dashboard/base.html' %}
+
+{% load images %}
+
+{% block page_title %}Picture Thumbnails{% endblock %}
+
+{% block extrastyle %}
+p { margin-bottom: 5px; }
+{% endblock %}
+
+{% block content %}
+<header>
+  <h1>'{{ photo.title|default:"Untitled" }}' Thumbnails</h1>
+  <p>View all generated thumbnails of a picture.</p>
+</header>
+
+{% for t in photo.thumbnail_set.all %}
+<p>
+  {% getImageTag photo t.size.name %}
+</p>
+{% endfor %}
+
+<p>
+  <a href="{% url photo_thumbs_generate photo.id %}" class="aButton">Regenerate Thumbnails</a>
+</p>
+
+{% endblock %}
+
