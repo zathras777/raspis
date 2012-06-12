@@ -152,7 +152,7 @@ def set_site_details(url, name, author):
     cgrp.set('name', name)
     cgrp.set('author', author)
 
-    from django.contrib.site.models import Site
+    from django.contrib.sites.models import Site
     ss = Site.objects.get(pk = 1)
     ss.domain = url
     ss.name = name
