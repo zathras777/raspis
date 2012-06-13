@@ -105,9 +105,13 @@ In order to function we require a database. Please answer the following...
     ]
     engine = option_question("Which database engine will you be using?", db_options)
     subst_vars['DB_ENGINE'] = 'django.db.backends.' + db_options[engine - 1][1]
-    subst_vars['DB_HOST'] = string_question('Database name?', '', True)
+    subst_vars['DB_NAME'] = string_question('Database name?', '', True)
     subst_vars['DB_USER'] = string_question('Database user?', '', True)
-    subst_vars['DB_PASSWORD'] = string_question('Database user password?', '', True)
+    subst_vars['DB_PASSWD'] = string_question('Database user password?', '', True)
+    if not bool_question('''Are you happy to accept the default hostname and port
+for the database server?''', True):
+        subst_vars['DB_HOST'] = string_question('Database server hostname?', '', True)
+        subst_vars['DB_PORT'] = string_question('Database server port number?', '', True)
 
 def add_admins():
     print "\nAdministrators\nThe admins listed in the settings file will be sent emails when something goes wrong!"
