@@ -1,6 +1,10 @@
 import os
 
-from django.conf.urls import patterns, include, url
+# Try and import from newer django installs, but fallback gracefully
+try:
+    from django.conf.urls import patterns, include, url
+except ImportError:
+    from django.conf.urls.defaults import *
 from django.conf import settings
 
 from django.contrib import admin
