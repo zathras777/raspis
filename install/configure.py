@@ -32,6 +32,7 @@ subst_vars = {
     'ROOT_DIR': ROOT_DIR,
     'STATIC_DIR': os.path.join(ROOT_DIR, 'static'),
     'TEMPLATE_DIR': os.path.join(ROOT_DIR, 'templates'),
+    'CONTEXT_14': '',
 }
 
 def make_secret_key():
@@ -161,7 +162,14 @@ def set_site_details(url, name, author):
     ss.domain = url
     ss.name = name
     ss.save()
-    
+
+def django_versions():
+    from django import VERSION
+    if VERSION[0] == 1 and VERSION[1] >= 4:
+        subst_vars['CONTEXT_14'] = '''TEMPLATE_CONTEXT_PROCESSORS += ( 
+    'django.core.context_processors.tz',
+)'''
+        
 def syncdb():
     call_command('syncdb', interactive = False)
          
@@ -191,6 +199,8 @@ First, a few questions...
     make_secret_key()
 
     add_admins()
+    django_versions()
+    print subst_vars
     
     print "\nNow creating configuration files..."
     file_ops = (

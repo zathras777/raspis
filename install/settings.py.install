@@ -30,7 +30,7 @@ DATABASES = {
 TIME_ZONE = @TZ@
 LANGUAGE_CODE = @LANG@
 USE_I18N = @USE_I18N@
-USE_TZ = @USE_TZ@
+##USE_TZ = @USE_TZ@
 
 MEDIA_ROOT = @MEDIA_DIR@
 MEDIA_URL =  @MEDIA_URL@
@@ -92,11 +92,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
-    'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'config.context.site_settings',
     'raspis.context.site_settings'
 )
+
+@CONTEXT_14@
 
 INSTALLED_APPS = (
     'django.contrib.auth',
