@@ -32,7 +32,7 @@ subst_vars = {
     'ROOT_DIR': ROOT_DIR,
     'STATIC_DIR': os.path.join(ROOT_DIR, 'static'),
     'TEMPLATE_DIR': os.path.join(ROOT_DIR, 'templates'),
-    'CONTEXT_14': '',
+    'CONTEXT_PROCS': '',
 }
 
 def make_secret_key():
@@ -48,7 +48,10 @@ def copy_subst_settings(src, dest):
     subst_vars['TIME_DATE'] = datetime.today().strftime("%H:%I %d %B %Y")
     
     for k,v in subst_vars.items():
-        val = "'%s'" % v if type(v) == str else "%s" % v
+        if type(v) == str and not re.match("[A-Z_]+ [+]?=", v):
+            val = "'%s'" % v
+        else:
+            val = "%s" % v
         raw = re.sub('@%s@' % k, val, raw)
 
     admin_strings = ["('%s', '%s')" % (k,v) for k,v in admins.items()]
@@ -66,10 +69,10 @@ def string_question(q, a = '', rqd = False, min_length = 0):
         raw = a
     if min_length > 0 and len(raw) < min_length:
         print "Your reply is too short. Minimum of %d characters required" % min_length
-        return ask_question(q, a, rqd, min_length)
+        return string_question(q, a, rqd, min_length)
     if rqd and len(raw) == 0:
         print "An answer is required"
-        return ask_question(q, a, rqd, min_length)
+        return string_question(q, a, rqd, min_length)
     return raw
 
 def bool_question(q, a = False):
@@ -166,7 +169,7 @@ def set_site_details(url, name, author):
 def django_versions():
     from django import VERSION
     if VERSION[0] == 1 and VERSION[1] >= 4:
-        subst_vars['CONTEXT_14'] = '''TEMPLATE_CONTEXT_PROCESSORS += ( 
+        subst_vars['CONTEXT_PROCS'] = '''TEMPLATE_CONTEXT_PROCESSORS += ( 
     'django.core.context_processors.tz',
 )'''
         
@@ -230,5 +233,10 @@ First, a few questions...
     print "\nCollecting required static files...\n"
     collectstatic()
     
-    print "\nConfiguration is now complete."
-    
+    print '''\nConfiguration is now complete.
+
+To run the website locally, type
+
+./manage runserver
+'''
+
