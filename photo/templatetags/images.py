@@ -8,7 +8,7 @@ register = template.Library()
 
 IMG_TAG=Template("""
   <img data-id="{{image.photo.id}}" src="{{ image.img.url }}"
-       width="{{image.img.width}}" height="{{image.img.height}}" 
+       width="{{image.img.width}}" height="{{image.img.height}}"
        alt="{{image.photo.title|default:"Untitled"}}"
        title="{{image.photo.title|default:"Untitled"}}"
        />
@@ -28,10 +28,12 @@ class imageTagNode(template.Node):
             return ""
         if hasattr(self, 'format_node'):
             self.format = self.format_node.resolve(context)
+        print(pic)
         if isinstance(pic, Thumbnail):
             img = pic
         else:
             img = pic.get_thumbnail(self.format)
+
         if not img:
             return ""
         context.push()
@@ -45,6 +47,5 @@ class imageTagNode(template.Node):
 def getImageTag(parser, token):
     contents = token.split_contents()
     if len(contents) < 2:
-        raise template.TemplateSyntaxError("%r tag requires at least one argument" % contents[0])   
+        raise template.TemplateSyntaxError("%r tag requires at least one argument" % contents[0])
     return imageTagNode(contents[1], contents[2] if len(contents) == 3 else '')
-

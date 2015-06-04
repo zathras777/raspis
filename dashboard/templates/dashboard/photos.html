@@ -9,7 +9,7 @@
 #content ol li { font-size: 12pt; margin: 3px 0; }
 .options { width: 100px; height: 100px; position: absolute; top: 25px; left: 25px; text-align: center; display: none; }
 .options>p { margin: 10px 0; padding: 3px; }
-.used { position: absolute; top: 3px; left: 3px; padding: 3px; 
+.used { position: absolute; top: 3px; left: 3px; padding: 3px;
         font-size: 14pt; text-align: center; vertical-align: middle; }
 .used>a { text-decoration: none; color: white; }
 .remove_x { position: absolute; top: 3px; right: 3px; padding: 3px 5px; text-align: center; }
@@ -45,11 +45,11 @@ article>header a { color: inherit; }
 {% for c in cats %}
 <article class="clearfix category round10" id="{{c.slug}}">
   <header>
-    <h1><a href="{% url category_edit c.slug%}">{{c.name}}</a> ({{c.photos.count}})</h1>
+    <h1><a href="{% url 'category_edit' c.slug%}">{{c.name}}</a> ({{c.photos.count}})</h1>
   </header>
   {% for p in c.photos.all %}
   <div class="photo" data-id="{{p.id}}">
-  {% getImageTag p "Square" %}
+  {% getImageTag p Square %}
     <div class="options">
       <p class="overlay edit round10">edit</p>
       <p class="overlay remove round10">remove</p>
@@ -68,13 +68,13 @@ $(document).on({
 $("article>div").draggable({ opacity: 0.7, scroll: true,
 appendTo: 'body'
 });
-$("article").droppable({ 
+$("article").droppable({
   drop: function( event, ui ) {
     event.stopPropagation(); event.preventDefault();
     var el = ui.draggable;
     var tgt = $(this);
-    $.ajax({url: '{% url category_ajax %}', type: 'post', 
-            data: {'id': el.attr('data-id'), 'slug': tgt.attr('id'), 
+    $.ajax({url: '{% url 'category_ajax' %}', type: 'post',
+            data: {'id': el.attr('data-id'), 'slug': tgt.attr('id'),
                    'action': 'move'},
             success: function() {
               el.remove().css({'left': 0, 'top': 0}).appendTo(tgt)
@@ -84,7 +84,7 @@ $("article").droppable({
            });
   }
 });
-var edit_url = '{% url photo_edit '12345' %}';
+var edit_url = '{% url 'photo_edit' '12345' %}';
 $(document).on({
   click: function() {
      var el = $(this).parent().parent();
@@ -96,7 +96,7 @@ $(document).on({
            var el = $(this);
            var tgt = el.parent().parent();
            if (confirm("Please confirm you wish to remove this image?")) {
-             $.ajax({url: '{% url picture_ajax %}', type: 'post',
+             $.ajax({url: '{% url 'picture_ajax' %}', type: 'post',
                      data: {'action': 'remove', 'id': tgt.attr('data-id')},
                      success: function() { tgt.fadeOut('slow', function() { tgt.remove(); }); }
                     });

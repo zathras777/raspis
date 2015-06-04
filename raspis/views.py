@@ -1,19 +1,14 @@
-from datetime import date
-import math
 import urlparse
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django import forms
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from models import *
+from raspis.models import *
 from photo.models import *
+from raspis.models import Category, Page, DailyPhoto
 from utils.json import JSONResponse
 from utils.photos import photo_category, record_photo_view
 from utils.gallery import make_gallery
@@ -25,8 +20,7 @@ def home(request):
         referer = request.META.get('HTTP_REFERER', '')
         if referer and urlparse.urlparse(referer).path == '/':
             request.session['indexp'] = 0
-    return render_to_response('index.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 def ajax_categories(request):
     start = 0
@@ -57,20 +51,20 @@ def category_json(cat):
     if n < len(cats) - 1:
         rv['next'] = cats[n + 1].as_dict()
     return rv
-    
+
 def category(request, slug):
     cat = get_object_or_404(Category, slug = slug)
     rv = category_json(cat)
     if not request.user.is_staff:
         cat.record_view()
     return render_to_response('category.html', locals(),
-                                  context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 
 def category_gallery(request, slug):
     cat = get_object_or_404(Category, slug = slug)
     gallery = make_gallery(cat.photos.all(), int(request.GET['width']))
     return JSONResponse(gallery)
-    
+
 def category_slideshow(request, slug):
     cat = get_object_or_404(Category, slug = slug)
     images = slideshow_images(cat)
@@ -84,9 +78,9 @@ def show(request, pid):
     image = photo.get_thumbnail("Large")
     return render_to_response('picture.html', locals(),
                                   context_instance=RequestContext(request))
-    
+
 def page(request, slug):
-    p = get_object_or_404(Page, slug = slug)
+    p = get_object_or_404(Page, slug=slug)
     if p.url:
         return HttpResponseRedirect(p.url)
     return render_to_response('page.html', locals(),
@@ -96,16 +90,16 @@ def today(request):
     from datetime import date
     dt = date.today()
     try:
-        dp = DailyPhoto.objects.get(dt = dt)
+        dp = DailyPhoto.objects.get(dt=dt)
         category = photo_category(dp.photo)
         if not request.user.is_staff:
-            record_photo_view(photo)
+            record_photo_view(dp.photo)
         image = dp.photo.get_thumbnail('Large')
     except DailyPhoto.DoesNotExist:
         dp = None
     return render_to_response('today.html', locals(),
-                                  context_instance=RequestContext(request))
-        
+                              context_instance=RequestContext(request))
+
 def slideshow_images(cat):
     rv = []
     for i in cat.photos.all():
@@ -129,4 +123,3 @@ def original(request, pid):
     response = HttpResponse(image_data, mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename='+os.path.basename(photo.image.path)
     return response
-

@@ -4,4 +4,8 @@
 local_settings.py
 development.db
 application.wsgi
+.idea
+raspis/wsgi.py
+raspis/settings.py
+media/*
 

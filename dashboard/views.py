@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from dashboard.forms import CategoryForm, photoForm
 
 from utils.staff import staff_required
 from photo.models import *
@@ -24,18 +25,18 @@ from utils.photos import *
 
 @staff_required
 def home(request):
-#    tmpl = 'index.html' if not request.mobile else 'index_mobile.html'    
+#    tmpl = 'index.html' if not request.mobile else 'index_mobile.html'
     where = 'home'
     pics = Photo.objects.count()
     cats = Category.objects.count()
     return render_to_response('dashboard/index.html', locals(),
-                                  context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 @staff_required
 def settings(request, grp_name = 'site'):
     where = 'settings'
     if request.method == 'POST':
         form = ConfigForm(grp_name, request.POST)
-        if form.is_valid():           
+        if form.is_valid():
             form.save()
 #        else:
     else:
@@ -45,15 +46,15 @@ def settings(request, grp_name = 'site'):
     ss = SiteSettings()
     current = ss.settings
     return render_to_response('dashboard/settings.html', locals(),
-                                  context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 
 @staff_required
 def categories(request):
     cats = Category.objects.all()
     where = 'categories'
     return render_to_response('dashboard/categories.html', locals(),
-                                  context_instance=RequestContext(request))
-       
+                              context_instance=RequestContext(request))
+
 @staff_required
 def category_edit(request, slug = None):
     cat = None
@@ -64,7 +65,7 @@ def category_edit(request, slug = None):
         if form.is_valid():
             form.save()
             messages.info(request, "Category updated")
-            return HttpResponseRedirect(reverse('dashboard.views.categories'))
+            return HttpResponseRedirect(reverse('dashboard_categories'))
     else:
         form = CategoryForm(instance = cat)
 
@@ -82,7 +83,7 @@ def category_remove(request, slug):
     cat.delete()
     messages.info(request, "Removed category %s" % name)
     return HttpResponseRedirect(reverse('dashboard.views.categories'))
-    
+
 @csrf_exempt
 @staff_required
 def category_photo_add(request, slug):
@@ -119,7 +120,7 @@ def category_photo_set(request, slug):
         cat.image = t
         cat.save()
     return HttpResponse('OK')
-    
+
 @staff_required
 def category_photo_flip(request, slug):
     cat = get_object_or_404(Category, slug = slug)
@@ -151,9 +152,9 @@ def category_ajax(request):
        photo_category_set(photo, cat)
     elif action == 'remove':
         cat.remove_picture(photo)
-            
+
     return HttpResponse('OK')
-    
+
 @staff_required
 def pages(request):
     pages = Page.objects.all()
@@ -161,7 +162,7 @@ def pages(request):
     return render_to_response('dashboard/pages.html', locals(),
                                   context_instance=RequestContext(request))
 
-       
+
 @staff_required
 def page_edit(request, slug = None):
     page = None
@@ -183,15 +184,16 @@ def page_remove(request, slug):
     Page.objects.filter(slug = slug).delete()
     messages.info(request, "Page removed")
     return HttpResponseRedirect(reverse('dashboard.views.pages'))
-    
-               
+
+
 @staff_required
 def photos(request):
     where = 'pictures'
     cats = Category.objects.all()
-    uncat = Photo.objects.filter(category__isnull = True)   
+    uncat = Photo.objects.filter(category__isnull=True)
+    print(uncat)
     return render_to_response('dashboard/photos.html', locals(),
-                                  context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 
 @staff_required
 def upload(request):
@@ -211,7 +213,7 @@ def upload(request):
         form = photoForm()
     return render_to_response('dashboard/upload.html', locals(),
                                   context_instance=RequestContext(request))
-       
+
 @staff_required
 def photo_edit(request, pid):
     photo = get_object_or_404(Photo, pk = pid)
@@ -226,7 +228,7 @@ def photo_edit(request, pid):
         form = photoForm(instance = photo)
     return render_to_response('dashboard/photo_edit.html', locals(),
                                   context_instance=RequestContext(request))
-    
+
 @csrf_exempt
 @staff_required
 def picture_ajax(request):
@@ -237,7 +239,7 @@ def picture_ajax(request):
     if action == 'remove':
         photo.delete()
     return HttpResponse('OK')
-    
+
 @staff_required
 def photo_thumbs(request, pid):
     photo = get_object_or_404(Photo, pk = pid)
@@ -251,7 +253,7 @@ def photo_thumbs_generate(request, pid):
     messages.info(request, "Thumbnails regenerated")
     return HttpResponseRedirect(reverse('photo_thumbs', args=[pid]))
     return render_to_response('dashboard/thumbs.html', locals(),
-    
+
                                   context_instance=RequestContext(request))
 
 @staff_required
@@ -284,7 +286,7 @@ def users(request):
                                   context_instance=RequestContext(request))
 
 @staff_required
-def user_edit(request, uid = None):       
+def user_edit(request, uid = None):
     u = None
     if uid is not None:
         u = get_object_or_404(User, pk = uid)
@@ -304,7 +306,7 @@ def user_edit(request, uid = None):
                                   context_instance=RequestContext(request))
 
 @staff_required
-def user_pw(request, uid):       
+def user_pw(request, uid):
     u = get_object_or_404(User, pk = uid)
     if request.method == 'POST':
         form = UserPwForm(request.POST)
@@ -325,7 +327,7 @@ def user_pw(request, uid):
             u.save()
             messages.info(request, "Password has been set")
             return HttpResponseRedirect(reverse('dashboard.views.users'))
-    else:    
+    else:
         form = UserPwForm()
     return render_to_response('dashboard/user_pw.html', locals(),
                                   context_instance=RequestContext(request))
@@ -345,7 +347,7 @@ def daily(request):
     past = DailyPhoto.objects.filter(dt__lt = date.today())
     present = DailyPhoto.objects.filter(dt = date.today())
     if len(present):
-        present = present[0]   
+        present = present[0]
     future = DailyPhoto.objects.filter(dt__gt = date.today())
     return render_to_response('dashboard/daily.html', locals(),
                                   context_instance=RequestContext(request))
@@ -362,4 +364,4 @@ def regenerate_thumbnails(request):
         p.make_thumbnails()
     messages.info(request, "Thumbnails have been regenerated.")
     return HttpResponseRedirect(reverse('dashboard.views.actions'))
-    
+

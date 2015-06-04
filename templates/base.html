@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, target-densityDpi=device-dpi, initial-scale=1.0">
-    <meta name="description" content="{{ seo_description }}">
-    <meta name="keywords" content="{{ seo_keywords }}">
+{% if seo_description %}    <meta name="description" content="{{ seo_description }}">{%endif%}
+{% if seo_keywords%}    <meta name="keywords" content="{{ seo_keywords }}">{%endif%}
     <title>{{ site_name }} : {% block page_title %}Welcome!{% endblock %}</title>
 {% if debug %}
     <script src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"> </script>
@@ -15,22 +15,20 @@
     <script src="{{ STATIC_URL }}js/html5shiv-printshiv.js"> </script>
 <![endif]-->
     <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="{% url rss%}" />
-    <link rel="alternate" type="application/atom+xml" title="Atom" href="{% url atom %}" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="{% url 'rss'%}" />
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="{% url 'atom' %}" />
 {% block extrahead %}{% endblock %}
-{% if seo_google_analytic %}
-<script type="text/javascript">
+    <style>{% block extrastyle %}{% endblock %}</style>
+{% if seo_google_analytic %}    <script type="text/javascript">
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '{{ seo_google_analytic }}']);
+  _gaq.push(['_setAccount', '{{seo_google_analytic}}']);
   _gaq.push(['_trackPageview']);
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-</script>
-{% endif %}
-    <style>{% block extrastyle %}{% endblock %}</style>
+    </script>{% endif %}
   </head>
   <body>
     <div id="wrap">
@@ -63,7 +61,7 @@
         </ul>
       </section>
 
-      <p class="bottom">All images {{ copyright|safe }}, {{ site_author }}.</p>
+      <p class="bottom">All images {{ site_copyright|safe }}.</p>
 </div>
     </footer>
 {% block extrascripts %}{% endblock %}
@@ -71,7 +69,7 @@
 {% block extrascript %}{% endblock %}
 $(document).on({
   mouseenter: function() { $(this).animate({ marginTop: -5 }); },
-  mouseleave: function() { $(this).animate({ marginTop: 0 }); }                
+  mouseleave: function() { $(this).animate({ marginTop: 0 }); }
 }, 'li.page a');
 </script>
   </body>

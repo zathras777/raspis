@@ -23,7 +23,7 @@
     {% if g == grp %}
       {{ g.name }}
     {% else %}
-  <a href="{% url settings_grp g.name %}">{{ g.name }}</a>
+  <a href="{% url 'settings_grp' g.name %}">{{ g.name }}</a>
     {% endif %}
   {% endfor %}
 </p>

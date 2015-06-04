@@ -13,8 +13,8 @@
   {% getImageTag photo "Medium" %}
 </p>
 <p class="centered">
-  <a href="{% url original photo.id %}" class="aButton">Download Original</a>
-  <a href="{% url photo_thumbs photo.id %}" class="aButton">View Thumbnails</a>
+  <a href="{% url 'original' photo.id %}" class="aButton">Download Original</a>
+  <a href="{% url 'photo_thumbs' photo.id %}" class="aButton">View Thumbnails</a>
 </p>
 
 <form action="." method="POST" enctype="multipart/form-data">{% csrf_token %}

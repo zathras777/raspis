@@ -21,7 +21,7 @@ p { margin-bottom: 5px; }
 {% endfor %}
 
 <p>
-  <a href="{% url photo_thumbs_generate photo.id %}" class="aButton">Regenerate Thumbnails</a>
+  <a href="{% url 'photo_thumbs_generate' photo.id %}" class="aButton">Regenerate Thumbnails</a>
 </p>
 
 {% endblock %}
