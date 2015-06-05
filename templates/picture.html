@@ -19,20 +19,20 @@ box-shadow: 5px 5px 5px #888; }
 {% block content %}
 <header>
   <h1 class="centered">
-    <a href="{% url raspis.views.category category.slug %}">{{category.name}}</a>
+    <a href="{% url 'category' category.slug %}">{{category.name}}</a>
      : {{ photo.title|default:"Untitled" }}
   </h1>
 </header>
 
 <p class="picture">
-  <img src="{{image.img.url}}" width="{{image.img.width}}" 
-       height="{{image.img.height}}" alt="{{photo.title}}" 
+  <img src="{{image.img.url}}" width="{{image.img.width}}"
+       height="{{image.img.height}}" alt="{{photo.title}}"
        title="{{photo.title}}"/>
 </p>
 {% if options_twitter %}
 <p class="tweet">
-  <a href="https://twitter.com/share" class="twitter-share-button" 
-     data-url="http://{{site_url}}/pic/{{photo.id}}/" 
+  <a href="https://twitter.com/share" class="twitter-share-button"
+     data-url="http://{{site_url}}/pic/{{photo.id}}/"
      data-text="{{site_name}} : {{ photo.title }}" data-dnt="true">Tweet</a>
 </p>
 {% endif %}
@@ -55,7 +55,7 @@ box-shadow: 5px 5px 5px #888; }
 {% block extrascript %}
 function do_slideshow()
 {
-  $.getJSON('{% url category_slideshow category.slug %}', function(response){
+  $.getJSON('{% url 'category_slideshow' category.slug %}', function(response){
     $.fancybox(response.images, {
         'padding'           : 0,
         'transitionIn'      : 'none',
@@ -64,7 +64,7 @@ function do_slideshow()
         'changeFade'        : 0,
         'autoPlay': true
     });
-  }); 
+  });
 }
 
 $('.links a').on({

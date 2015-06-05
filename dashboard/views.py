@@ -1,36 +1,26 @@
-from datetime import date
-import math
-
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, Http404
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
-from django import forms
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib import messages
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-from dashboard.forms import CategoryForm, photoForm
+from dashboard.forms import CategoryForm, photoForm, szForm, UserForm, UserPwForm, pageForm
 
 from utils.staff import staff_required
-from photo.models import *
 from raspis.models import *
 from config.models import *
 from config.forms import ConfigForm
 from config.context import SiteSettings
-from utils.json import JSONResponse
-from forms import *
+from utils.json_encoding import JSONResponse
 from utils.photos import *
 
 @staff_required
 def home(request):
-#    tmpl = 'index.html' if not request.mobile else 'index_mobile.html'
     where = 'home'
     pics = Photo.objects.count()
     cats = Category.objects.count()
-    return render_to_response('dashboard/index.html', locals(),
-                              context_instance=RequestContext(request))
+    return render(request, 'dashboard/index.html', locals())
+
 @staff_required
 def settings(request, grp_name = 'site'):
     where = 'settings'
@@ -45,18 +35,16 @@ def settings(request, grp_name = 'site'):
     grps = ConfigGroup.objects.all().order_by('name')
     ss = SiteSettings()
     current = ss.settings
-    return render_to_response('dashboard/settings.html', locals(),
-                              context_instance=RequestContext(request))
+    return render(request, 'dashboard/settings.html', locals())
 
 @staff_required
 def categories(request):
     cats = Category.objects.all()
     where = 'categories'
-    return render_to_response('dashboard/categories.html', locals(),
-                              context_instance=RequestContext(request))
+    return render(request, 'dashboard/categories.html', locals())
 
 @staff_required
-def category_edit(request, slug = None):
+def category_edit(request, slug=None):
     cat = None
     if slug is not None:
         cat = get_object_or_404(Category, slug = slug)
@@ -73,8 +61,7 @@ def category_edit(request, slug = None):
         pics = cat.photos.all()
         avail = Photo.objects.exclude(id__in = [p.id for p in pics])
 
-    return render_to_response('dashboard/category_edit.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/category_edit.html', locals())
 
 @staff_required
 def category_remove(request, slug):
@@ -82,7 +69,7 @@ def category_remove(request, slug):
     name = cat.name
     cat.delete()
     messages.info(request, "Removed category %s" % name)
-    return HttpResponseRedirect(reverse('dashboard.views.categories'))
+    return HttpResponseRedirect(reverse('dashboard_categories'))
 
 @csrf_exempt
 @staff_required
@@ -96,7 +83,7 @@ def category_photo_add(request, slug):
 
 @staff_required
 def category_photo_get(request, slug):
-    cat = get_object_or_404(Category, slug = slug)
+    cat = get_object_or_404(Category, slug=slug)
     rv = {}
     if cat.image is not None:
         t = cat.image.photo.get_thumbnail('Small')
@@ -104,15 +91,16 @@ def category_photo_get(request, slug):
             rv['url'] = t.img.url
             rv['width'] = t.img.width
             rv['height'] = t.img.height
+
     return JSONResponse(rv)
 
 @csrf_exempt
 @staff_required
 def category_photo_set(request, slug):
-    cat = get_object_or_404(Category, slug = slug)
+    cat = get_object_or_404(Category, slug=slug)
     if not request.method == 'POST' or not request.POST.has_key('id'):
         raise Http404
-    pic = get_object_or_404(Photo, pk = request.POST['id'])
+    pic = get_object_or_404(Photo, pk=request.POST['id'])
     if not pic in cat.photos.all():
         cat.add_photo(pic)
     t = pic.get_thumbnail('Category')
@@ -152,16 +140,13 @@ def category_ajax(request):
        photo_category_set(photo, cat)
     elif action == 'remove':
         cat.remove_picture(photo)
-
     return HttpResponse('OK')
 
 @staff_required
 def pages(request):
     pages = Page.objects.all()
     where = 'pages'
-    return render_to_response('dashboard/pages.html', locals(),
-                                  context_instance=RequestContext(request))
-
+    return render(request, 'dashboard/pages.html', locals())
 
 @staff_required
 def page_edit(request, slug = None):
@@ -173,27 +158,23 @@ def page_edit(request, slug = None):
         if form.is_valid():
             form.save()
             messages.info(request, "Page updated")
-            return HttpResponseRedirect(reverse('dashboard.views.pages'))
+            return HttpResponseRedirect(reverse('dashboard_pages'))
     else:
         form = pageForm(instance = page)
-    return render_to_response('dashboard/page_edit.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/page_edit.html', locals())
 
 @staff_required
 def page_remove(request, slug):
     Page.objects.filter(slug = slug).delete()
     messages.info(request, "Page removed")
-    return HttpResponseRedirect(reverse('dashboard.views.pages'))
-
+    return HttpResponseRedirect(reverse('dashboard_pages'))
 
 @staff_required
 def photos(request):
     where = 'pictures'
     cats = Category.objects.all()
     uncat = Photo.objects.filter(category__isnull=True)
-    print(uncat)
-    return render_to_response('dashboard/photos.html', locals(),
-                              context_instance=RequestContext(request))
+    return render(request, 'dashboard/photos.html', locals())
 
 @staff_required
 def upload(request):
@@ -211,8 +192,7 @@ def upload(request):
             return HttpResponseRedirect(".")
     else:
         form = photoForm()
-    return render_to_response('dashboard/upload.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/upload.html', locals())
 
 @staff_required
 def photo_edit(request, pid):
@@ -223,11 +203,10 @@ def photo_edit(request, pid):
             p = form.save()
             photo_category_set(p, form.cleaned_data['category'])
             messages.info(request, "Picture details updated")
-            return HttpResponseRedirect(reverse('dashboard.views.photos'))
+            return HttpResponseRedirect(reverse('dashboard_photos'))
     else:
         form = photoForm(instance = photo)
-    return render_to_response('dashboard/photo_edit.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/photo_edit.html', locals())
 
 @csrf_exempt
 @staff_required
@@ -243,8 +222,8 @@ def picture_ajax(request):
 @staff_required
 def photo_thumbs(request, pid):
     photo = get_object_or_404(Photo, pk = pid)
-    return render_to_response('dashboard/thumbs.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/thumbs.html', locals())
+
 
 @staff_required
 def photo_thumbs_generate(request, pid):
@@ -252,16 +231,12 @@ def photo_thumbs_generate(request, pid):
     photo.make_thumbnails()
     messages.info(request, "Thumbnails regenerated")
     return HttpResponseRedirect(reverse('photo_thumbs', args=[pid]))
-    return render_to_response('dashboard/thumbs.html', locals(),
-
-                                  context_instance=RequestContext(request))
 
 @staff_required
 def sizes(request):
     sizes = ThumbnailSize.objects.all()
     where = 'sizes'
-    return render_to_response('dashboard/sizes.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/sizes.html', locals())
 
 @staff_required
 def size_edit(request, sid = None):
@@ -272,18 +247,16 @@ def size_edit(request, sid = None):
         form = szForm(request.POST, instance = sz)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('dashboard.views.sizes'))
+            return HttpResponseRedirect(reverse('dashboard_sizes'))
     else:
         form = szForm(instance = sz)
-    return render_to_response('dashboard/size_edit.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/size_edit.html', locals())
 
 @staff_required
 def users(request):
     where = 'users'
     users = User.objects.all()
-    return render_to_response('dashboard/users.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/users.html', locals())
 
 @staff_required
 def user_edit(request, uid = None):
@@ -299,11 +272,10 @@ def user_edit(request, uid = None):
             u.save()
             form.save_m2m()
             messages.info(request, "Update user details for %s" % u.username)
-            return HttpResponseRedirect(reverse('dashboard.views.users'))
+            return HttpResponseRedirect(reverse('dashboard_users'))
     else:
         form = UserForm(instance = u)
-    return render_to_response('dashboard/user_edit.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/user_edit.html', locals())
 
 @staff_required
 def user_pw(request, uid):
@@ -326,19 +298,17 @@ def user_pw(request, uid):
             u.set_password(request.POST['pw1'])
             u.save()
             messages.info(request, "Password has been set")
-            return HttpResponseRedirect(reverse('dashboard.views.users'))
+            return HttpResponseRedirect(reverse('dashboard_users'))
     else:
         form = UserPwForm()
-    return render_to_response('dashboard/user_pw.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/user_pw.html', locals())
 
 @staff_required
 def views(request):
     where = 'views'
     photos = PhotoCounter.objects.all().order_by('views')
     cats = CategoryCounter.objects.all().order_by('views')
-    return render_to_response('dashboard/views.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/views.html', locals())
 
 @staff_required
 def daily(request):
@@ -349,19 +319,16 @@ def daily(request):
     if len(present):
         present = present[0]
     future = DailyPhoto.objects.filter(dt__gt = date.today())
-    return render_to_response('dashboard/daily.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/daily.html', locals())
 
 @staff_required
 def actions(request):
     where = 'actions'
-    return render_to_response('dashboard/actions.html', locals(),
-                                  context_instance=RequestContext(request))
+    return render(request, 'dashboard/actions.html', locals())
 
 @staff_required
 def regenerate_thumbnails(request):
     for p in Photo.objects.all():
         p.make_thumbnails()
     messages.info(request, "Thumbnails have been regenerated.")
-    return HttpResponseRedirect(reverse('dashboard.views.actions'))
-
+    return HttpResponseRedirect(reverse('dashboard_actions'))

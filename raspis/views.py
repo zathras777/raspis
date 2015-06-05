@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from raspis.models import *
 from photo.models import *
 from raspis.models import Category, Page, DailyPhoto
-from utils.json import JSONResponse
+from utils.json_encoding import JSONResponse
 from utils.photos import photo_category, record_photo_view
 from utils.gallery import make_gallery
 

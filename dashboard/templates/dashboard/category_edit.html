@@ -17,34 +17,45 @@ form label, form input[type='text'] { font-size: 14pt; }
 <table width="100%">
   <tr>
     <td width="20%" align="center" vertical-align="middle" id="catpicture" style="position: relative;">
-      <p>Drop an image to set the category picture</p>      
-<span id="flip">flip</span>
+{% if cat.image %}
+        {% getImageTag cat.image %}
+        <span id="flip">flip</span>
+{%else %}
+        <p>Drop an image here to set the category picture</p>
+{%endif%}
     </td>
+
     <td width="80%">
-<form action="." method="POST">{% csrf_token %}
-{{ form.as_p }}
-<p><input type="submit" class="aButton" value="{% if cat %}Update{% else %}Create{% endif %}"/></p>
-</form>
+        <form action="." method="POST">{% csrf_token %}
+            {{ form.as_p }}
+            <p>
+                <input type="submit" class="aButton" value="{% if cat %}Update{% else %}Create{% endif %}"/>
+            </p>
+        </form>
     </td>
   </tr>
 </table>
 
 {% if cat %}
 <section id="drop_add">
-  <header><h1>Photos Included</h1></header>
-<div id="included">
-{% for p in pics %}{% getImageTag p "Small Square" %}{% empty %}<p>No photos included at present.</p>{% endfor %}
-</div>
+    <header><h1>Photos Included</h1></header>
+    <div id="included">
+    {% for p in pics %}{% getImageTag p "Square" %}{% empty %}<p>No photos included at present.</p>{% endfor %}
+    </div>
 </section>
 
 <section id="drop_remove">
   <header><h1>Photos Available To Include</h1></header>
 <div id="avail">
-{% for p in avail %}{% getImageTag p "Small Square" %}{% empty %}<p>No photos available to be include.</p>{% endfor %}
+{% for p in avail %}
+    {% getImageTag p "Square" %}
+{% empty %}
+    <p>No photos available to be include.</p>
+{% endfor %}
 </div>
 </section>
 <div id="spinner" class="round10">
-  <img src="/css/ajax-loader2.gif" align="center"/>
+  <img src="{{STATIC_URL}}css/ajax-loader2.gif" align="center"/>
   <p>Submitting...</p>
 </div>
 
@@ -63,11 +74,11 @@ function move_element(el, to)
       el.remove().appendTo(to).fadeIn().draggable(options);
     });
 }
-$("#drop_add").droppable({ 
+$("#drop_add").droppable({
   drop: function( event, ui ) {
     $('#spinner').show();
     var el = ui.draggable;
-    $.ajax({url: 'photo/add/', type: 'post', 
+    $.ajax({url: 'photo/add/', type: 'post',
             data: {'id': el.attr('data-id')},
             success: function() { move_element(el, $('#included')); },
             complete: function() { $('#spinner').hide(); }
@@ -75,11 +86,11 @@ $("#drop_add").droppable({
 
   }
 });
-$("#drop_remove").droppable({ 
+$("#drop_remove").droppable({
   drop: function( event, ui ) {
     $('#spinner').show();
     var el = ui.draggable;
-    $.ajax({url: 'photo/remove/', type: 'post', 
+    $.ajax({url: 'photo/remove/', type: 'post',
             data: {'id': el.attr('data-id')},
             success: function() { move_element(el, $('#avail')); },
             complete: function() { $('#spinner').hide(); }
@@ -90,18 +101,20 @@ $("#drop_remove").droppable({
 $("#catpicture").droppable({
   drop: function(ev, ui) {
     var el = ui.draggable;
-    $.ajax({url: 'photo/set/', type: 'post', 
+    $.ajax({url: 'photo/set/', type: 'post',
             data: {'id': el.attr('data-id')},
             success: get_picture
            });
   }
 });
+{%if cat %}
 function get_picture() {
   $('#catpicture').find('img').remove();
   $('#catpicture>p').show();
-  $.ajax({url: 'photo/get/',
+  $.ajax({url: '{% url 'category_photo_get' cat.slug %}',
           dataType: 'json',
           success: function(data) {
+console.log(data);
             if (data.url) {
               $('#catpicture>p').hide();
               url = data.url + '?lastmod=' + new Date().getTime();
@@ -110,6 +123,7 @@ function get_picture() {
           }
   });
 }
+{%endif%}
 $('#flip').click(function() {
   $.ajax({url: 'photo/flip/',
           success: function() {

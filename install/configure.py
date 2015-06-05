@@ -174,6 +174,10 @@ def set_site_details(url, name, author):
 
     from photo.models import ThumbnailSize
     ThumbnailSize(name="Square", width=150, square=True).save()
+    ThumbnailSize(name="Category", width=600, height=400).save()
+    ThumbnailSize(name="Small", width=200).save()
+    ThumbnailSize(name="Medium", width=400, height=300).save()
+    ThumbnailSize(name="Large", width=800).save()
 
 def django_versions():
     from django import VERSION

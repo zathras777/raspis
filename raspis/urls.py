@@ -1,12 +1,13 @@
-import raspis
-
 try:
     from django.conf.urls import include, url
 except ImportError:
     from django.conf.urls.defaults import include, urls
 
 from django.contrib import admin
+from django.conf import settings
 from django.contrib.auth.views import login, logout
+from django.conf.urls.static import static
+
 from raspis import feeds, views
 
 admin.autodiscover()
@@ -37,3 +38,5 @@ urlpatterns = [
     url(r'^original/(?P<pid>\d+)/$', views.original, name='original'),
     url(r'^pic/(?P<pid>\d+)/$', views.show, name='show'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

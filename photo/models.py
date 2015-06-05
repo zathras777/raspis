@@ -1,8 +1,7 @@
 import os
 import hashlib
-import pyexiv2
 import math
-from os.path import basename, splitext, dirname, join, exists
+from os.path import basename, splitext, exists
 
 try:
     from cStringIO import StringIO
@@ -10,9 +9,8 @@ except ImportError:
     from io import StringIO
 
 from django.db import models
-from django.db.models.signals import post_delete, pre_save, post_save
+from django.db.models.signals import post_delete, post_save
 
-from config.models import ConfigItem
 from raspis.constants import YESNO
 
 
@@ -149,20 +147,8 @@ class Thumbnail(models.Model):
     size = models.ForeignKey(ThumbnailSize)
     img = models.ImageField(upload_to='thumbnails', null = True)
 
-    def __unicode__(self): return u'%s [%d, %s]' % (self.photo.title, self.id, self.size.name)
-
-    def get_ratio(self):
-        # if square, shortest must be at least the required dimension
-        if self.size.square:
-            ratio = float(self.size.width) / self.photo.shortest
-        elif self.size.absolute:
-            ratio = max((float(self.size.width) / self.photo.image.width),
-                        (float(self.size.height) / self.photo.image.height))
-        else:
-            ratio = self.size.longest / self.photo.longest
-        if ratio > 1:
-            return 1.0
-        return ratio
+    def __unicode__(self):
+        return u'%s [%d, %s]' % (self.photo.title, self.id, self.size.name)
 
     def get_new_size(self, sz):
         # if square, shortest must be at least the required dimension
@@ -172,11 +158,12 @@ class Thumbnail(models.Model):
             ratio = max((float(self.size.width) / self.photo.image.width),
                         (float(self.size.height) / self.photo.image.height))
         else:
-            ratio = self.size.longest / self.photo.longest
-        if ratio > 1: ratio = 1.0
+            ratio = float(self.size.longest) / self.photo.longest
+        if ratio > 1.0:
+            ratio = 1.0
         w = math.ceil(ratio * sz[0])
         h = math.ceil(ratio * sz[1])
-        return (int(w),int(h))
+        return int(w), int(h)
 
     def make_thumbnail(self):
         from PIL import Image
@@ -186,15 +173,14 @@ class Thumbnail(models.Model):
             os.remove(self.img.path)
 
         orig = Image.open(self.photo.image.path)
-        thumbDir = dirname(self.photo.image.name)
         fName, ext = splitext(basename(self.photo.image.name))
-        thumbFilename = '%s_%s%s' % (self.photo.id, self.size.filename_name, ext)
+        thumb_filename = '%s_%s%s' % (self.photo.id, self.size.filename_name, ext)
 
-        newSz = self.get_new_size(orig.size)
-        orig.thumbnail(newSz, Image.ANTIALIAS)
+        new_sz = self.get_new_size(orig.size)
+        orig.thumbnail(new_sz, Image.ANTIALIAS)
 
         if self.size.crop_required:
-            cropped = self.size.make_crop(newSz)
+            cropped = self.size.make_crop(new_sz)
             orig = orig.crop(cropped)
 
         if ext.lower() in ['.jpeg', '.jpg']:
@@ -210,11 +196,10 @@ class Thumbnail(models.Model):
         temp_handle = StringIO()
         orig.save(temp_handle, PIL_TYPE)
         temp_handle.seek(0)
-        suf = SimpleUploadedFile(thumbFilename, temp_handle.read(),
+        suf = SimpleUploadedFile(thumb_filename, temp_handle.read(),
                                  content_type=DJANGO_TYPE)
-        print("saving thumbnail id %s" % self.id)
-        self.img.save(thumbFilename, suf, save=True)
-        self.insert_copyright()
+        self.img.save(thumb_filename, suf, save=True)
+#        self.insert_copyright()
 
     def flip(self):
         from PIL import Image
@@ -222,6 +207,8 @@ class Thumbnail(models.Model):
         ni = orig.transpose(Image.FLIP_LEFT_RIGHT)
         ni.save(self.img.path)
 
+"""
+pyexiv2 is python 2.x only, so until a replacement can be found - don't do this!
     def insert_copyright(self):
         try:
             metadata = pyexiv2.ImageMetadata(self.img.path)
@@ -229,7 +216,7 @@ class Thumbnail(models.Model):
         except IOError:
             return
         try:
-            cfg = ConfigItem.objects.get(group = 'settings', key='site_author')
+            cfg = ConfigItem.objects.get(group='settings', key='site_author')
             name = cfg.value or cfg.dflt
             # todo - copyright? year?
             copy = 'Copyright %s. All rights reserved.' % name
@@ -242,7 +229,7 @@ class Thumbnail(models.Model):
             metadata.write()
         except:
             pass
-
+"""
 
 
 def insert_required(verbosity):
