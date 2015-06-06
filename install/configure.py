@@ -253,6 +253,6 @@ First, a few questions...
 
 To run the website locally, type
 
-./manage runserver
+./manage.py runserver
 ''')
 

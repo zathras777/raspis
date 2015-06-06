@@ -8,4 +8,4 @@ application.wsgi
 raspis/wsgi.py
 raspis/settings.py
 media/*
-
+*~
