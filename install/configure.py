@@ -5,6 +5,8 @@ import sys
 import re
 from datetime import datetime
 
+real_input = vars(__builtins__).get('raw_input',input)
+
 from django.core.management import call_command
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -13,7 +15,7 @@ INSTALL_PATH = os.path.join(ROOT_DIR, 'install')
 admins = {}
 subst_vars = {
     'DB_ENGINE': "django.db.backends.sqlite3",
-    'DB_NAME': os.path.join(ROOT_DIR, 'development.db'),
+    'DB_NAME': "os.path.join(BASE_DIR, 'development.db')",
     'DB_USER': '',
     'DB_PASSWD': '',
     'DB_HOST': '',
@@ -27,11 +29,9 @@ subst_vars = {
     'MEDIA_URL': '/media/',
     'STATIC_URL': '/static/',
     # Directories we refer to in the settings file
-    'LOCAL_DIR': os.path.join(ROOT_DIR, 'local'),
-    'MEDIA_DIR': os.path.join(ROOT_DIR, 'media'),
-    'ROOT_DIR': ROOT_DIR,
-    'STATIC_DIR': os.path.join(ROOT_DIR, 'static'),
-    'TEMPLATE_DIR': os.path.join(ROOT_DIR, 'templates'),
+    'MEDIA_DIR': 'media',
+    'STATIC_DIR': 'static',
+    'TEMPLATE_DIR': 'templates',
     'CONTEXT_PROCS': '',
 }
 
@@ -47,11 +47,11 @@ def copy_subst_settings(src, dest):
     subst_vars['DATE_TIME'] = datetime.today().strftime("%H:%I %d %B %Y")
 
     for k,v in subst_vars.items():
-        if type(v) == str and not re.match("[A-Z_]+ [+]?=", v):
-            val = "'%s'" % v
-        else:
-            val = "%s" % v
-        raw = re.sub('@%s@' % k, val, raw)
+#        if type(v) == str and not re.match("[A-Z_]+ [+]?=", v):
+#            val = "'%s'" % v
+#        else:
+#            val = "%s" % v
+        raw = re.sub('@%s@' % k, str(v), raw)
 
     admin_strings = ["('%s', '%s')" % (k,v) for k,v in admins.items()]
     raw = re.sub('@ADMINS@', ",\n".join(admin_strings), raw)
@@ -62,7 +62,7 @@ def copy_subst_settings(src, dest):
 
 def string_question(q, a = '', rqd = False, min_length = 0):
     print(q)
-    raw = raw_input("[%s]: " % a)
+    raw = real_input("[%s]: " % a)
     if len(raw) == 0 and len(a) > 0:
         raw = a
     if min_length > 0 and len(raw) < min_length:
@@ -75,7 +75,7 @@ def string_question(q, a = '', rqd = False, min_length = 0):
 
 def bool_question(q, a = False):
     print(q + "(Y/N)")
-    raw = raw_input("[%s]: " % ('Y' if a else 'N'))
+    raw = real_input("[%s]: " % ('Y' if a else 'N'))
     if len(raw) == 0:
         return a
     if 'y' in raw.lower():
@@ -91,7 +91,7 @@ def option_question(q, opts, dflt = 1):
         nopts += 1
     if dflt < 1 or dflt > nopts:
         dflt = 1
-    n = raw_input("[%s]: " % dflt)
+    n = real_input("[%s]: " % dflt)
     if len(n) == 0 or not n.isdigit():
         return dflt
     return int(n)
@@ -114,6 +114,7 @@ In order to function we require a database. Please answer the following...
 for the database server?''', True):
         subst_vars['DB_HOST'] = string_question('Database server hostname?', '', True)
         subst_vars['DB_PORT'] = string_question('Database server port number?', '', True)
+    subst_vars['DB_NAME'] = "'{}'".format(subst_vars['DB_NAME'])
 
 def add_admins():
     print("\nAdministrators\nThe admins listed in the settings file will be sent emails when something goes wrong!")
@@ -145,6 +146,7 @@ use for your site administration needs.
     u.is_active = True
     u.is_staff = True
     u.is_superuser = True
+    u.save()    
     u.set_password(password)
     u.save()
     return ("%s %s" % (first_name, last_name)).strip()

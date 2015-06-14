@@ -9,3 +9,5 @@ raspis/wsgi.py
 raspis/settings.py
 media/*
 *~
+static/*
+
